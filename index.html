@@ -1,166 +1,119 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM CORRUPTED - ERROR 404</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        .terminal {
-            width: 90%;
-            max-width: 650px;
-            background: rgba(0, 10, 0, 0.9);
-            border: 2px solid #0f0;
-            padding: 20px;
-            box-shadow: 0 0 20px #0f0;
-            border-radius: 5px;
-        }
-        h1 {
-            text-align: center;
-            color: #ff0000;
-            text-shadow: 0 0 10px #ff0000;
-            font-size: 1.8rem;
-            margin-top: 0;
-        }
-        .line {
-            margin: 10px 0;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            border-bottom: 1px dashed rgba(0, 255, 0, 0.2);
-            padding-bottom: 5px;
-        }
-        .label {
-            color: #888;
-        }
-        .val {
-            color: #00ffcc;
-            font-weight: bold;
-        }
-        .warning {
-            color: #ffcc00;
-            text-align: center;
-            font-weight: bold;
-            margin-top: 15px;
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informacje o urządzeniu</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+body{
+background:#0d1117;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+color:white;
+padding:20px;
+}
+.box{
+width:500px;
+background:#161b22;
+border-radius:15px;
+padding:25px;
+box-shadow:0 0 20px rgba(0,0,0,.5);
+}
+h1{
+text-align:center;
+margin-bottom:20px;
+color:#58a6ff;
+}
+.item{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #30363d;
+}
+.value{
+color:#58a6ff;
+word-break:break-word;
+text-align:right;
+}
+</style>
 </head>
 <body>
-
-<div class="terminal">
-    <h1>[!] SYSTEM MONITORING ACTIVE [!]</h1>
-    <hr style="border: 1px solid #0f0; margin-bottom: 15px;">
-    
-    <div class="line"><span class="label">Twój Adres IP:</span> <span class="val" id="ip">Pobieranie...</span></div>
-    <div class="line"><span class="label">Lokalizacja:</span> <span class="val" id="location">Pobieranie...</span></div>
-    <div class="line"><span class="label">Dostawca Internetu:</span> <span class="val" id="isp">Pobieranie...</span></div>
-    <div class="line"><span class="label">Urządzenie & System:</span> <span class="val" id="os">Pobieranie...</span></div>
-    <div class="line"><span class="label">Przeglądarka:</span> <span class="val" id="browser">Pobieranie...</span></div>
-    <div class="line"><span class="label">Rozdzielczość ekranu:</span> <span class="val" id="resolution">Pobieranie...</span></div>
-    <div class="line"><span class="label">Stan baterii:</span> <span class="val" id="battery">Pobieranie...</span></div>
-    <div class="line"><span class="label">Twój czas lokalny:</span> <span class="val" id="time">Pobieranie...</span></div>
-
-    <div class="warning">POŁĄCZENIE ZABEZPIECZONE. NIE ZAMYKAJ OKNA.</div>
+<div class="box">
+<h1>Twoje informacje</h1>
+<div class="item"><span>🌐 Adres IP</span><span class="value" id="ip">Ładowanie...</span></div>
+<div class="item"><span>🏙️ Miasto</span><span class="value" id="city">...</span></div>
+<div class="item"><span>🗺️ Region</span><span class="value" id="region">...</span></div>
+<div class="item"><span>🇵🇱 Kraj</span><span class="value" id="country">...</span></div>
+<div class="item"><span>📡 Dostawca internetu</span><span class="value" id="isp">...</span></div>
+<div class="item"><span>🕒 Strefa czasowa</span><span class="value" id="timezone">...</span></div>
+<div class="item"><span>📱 Typ urządzenia</span><span class="value" id="device"></span></div>
+<div class="item"><span>💻 System</span><span class="value" id="os"></span></div>
+<div class="item"><span>🌐 Przeglądarka</span><span class="value" id="browser"></span></div>
+<div class="item"><span>🗣️ Język</span><span class="value" id="lang"></span></div>
+<div class="item"><span>🖥️ Rozdzielczość</span><span class="value" id="screen"></span></div>
+<div class="item"><span>🧠 Rdzenie CPU</span><span class="value" id="cpu"></span></div>
+<div class="item"><span>💾 RAM</span><span class="value" id="ram"></span></div>
+<div class="item"><span>🌙 Motyw</span><span class="value" id="theme"></span></div>
+<div class="item"><span>🌐 Status</span><span class="value" id="online"></span></div>
+<div class="item"><span>📅 Data i godzina</span><span class="value" id="time"></span></div>
 </div>
-
 <script>
-    // 1. Pobieranie IP oraz szczegółów sieci/lokalizacji
-    async function getIpData() {
-        try {
-            // Najpierw pobieramy sam adres IP z bezpiecznego API HTTPS
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipResponse.json();
-            const userIp = ipData.ip;
-            document.getElementById('ip').textContent = userIp;
-
-            // Następnie pobieramy szczegóły lokalizacji dla tego IP
-            const locResponse = await fetch(https://ipapi.co/${userIp}/json/);
-            const locData = await locResponse.json();
-            
-            let city = locData.city || "";
-            let region = locData.region || "";
-            let country = locData.country_name || "";
-            
-            document.getElementById('location').textContent = ${city} (${region}), ${country};
-            document.getElementById('isp').textContent = locData.org || "Nieznany";
-        } catch (error) {
-            document.getElementById('ip').textContent = "Ukryty/VPN";
-            document.getElementById('location').textContent = "Zablokowana (AdBlock?)";
-            document.getElementById('isp').textContent = "Prywatny dostawca";
-        }
-    }
-    getIpData();
-
-    // 2. Pobieranie systemu operacyjnego i urządzenia
-    function getOSAndDevice() {
-        const ua = navigator.userAgent;
-        let os = "Nieznany OS";
-        let device = "Komputer PC/Laptop";
-
-        if (ua.indexOf("Windows") !== -1) os = "Windows";
-        else if (ua.indexOf("Macintosh") !== -1) os = "macOS";
-        else if (ua.indexOf("Linux") !== -1) os = "Linux";
-        else if (ua.indexOf("Android") !== -1) { os = "Android"; device = "Telefon/Tablet"; }
-        else if (ua.indexOf("iPhone") !== -1) { os = "iOS (iPhone)"; device = "Telefon"; }
-        else if (ua.indexOf("iPad") !== -1) { os = "iOS (iPad)"; device = "Tablet"; }
-
-        return ${device} (${os});
-    }
-    document.getElementById('os').textContent = getOSAndDevice();
-
-    // 3. Pobieranie przeglądarki
-    function getBrowser() {
-        const ua = navigator.userAgent;
-        if (ua.indexOf("Chrome") !== -1 && ua.indexOf("Safari") !== -1 && ua.indexOf("Edg") === -1) return "Google Chrome";
-        if (ua.indexOf("Safari") !== -1 && ua.indexOf("Chrome") === -1) return "Safari";
-        if (ua.indexOf("Firefox") !== -1) return "Mozilla Firefox";
-        if (ua.indexOf("Edg") !== -1) return "Microsoft Edge";
-        if (ua.indexOf("OPR") !== -1 || ua.indexOf("Opera") !== -1) return "Opera";
-        return "Inna/Ukryta";
-    }
-    document.getElementById('browser').textContent = getBrowser();
-
-    // 4. Rozdzielczość ekranu
-    document.getElementById('resolution').textContent = ${window.screen.width} x ${window.screen.height} px;
-
-    // 5. Czas lokalny
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('time').textContent = now.toLocaleTimeString() + " (" + now.toLocaleDateString() + ")";
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    // 6. Poziom baterii
-    if (navigator.getBattery) {
-        navigator.getBattery().then(function(battery) {
-            function updateBatteryStatus() {
-                const level = Math.round(battery.level * 100);
-                const charging = battery.charging ? " (Ładowanie)" : " (Rozładowywanie)";
-                document.getElementById('battery').textContent = ${level}%${charging};
-            }
-            updateBatteryStatus();
-            battery.addEventListener('levelchange', updateBatteryStatus);
-            battery.addEventListener('chargingchange', updateBatteryStatus);
-        });
-    } else {
-        document.getElementById('battery').textContent = "Brak dostępu / PC";
-    }
+fetch("https://ipapi.co/json/")
+.then(r=>r.json())
+.then(data=>{
+document.getElementById("ip").textContent=data.ip;
+document.getElementById("city").textContent=data.city;
+document.getElementById("region").textContent=data.region;
+document.getElementById("country").textContent=data.country_name;
+document.getElementById("isp").textContent=data.org;
+document.getElementById("timezone").textContent=data.timezone;
+});
+const ua=navigator.userAgent;
+let browser="Nieznana";
+if(ua.includes("Chrome")) browser="Google Chrome";
+if(ua.includes("Firefox")) browser="Mozilla Firefox";
+if(ua.includes("Safari")&&!ua.includes("Chrome")) browser="Safari";
+if(ua.includes("Edg")) browser="Microsoft Edge";
+let os="Nieznany";
+if(ua.includes("Windows")) os="Windows";
+if(ua.includes("Android")) os="Android";
+if(ua.includes("iPhone")) os="iPhone (iOS)";
+if(ua.includes("iPad")) os="iPad (iPadOS)";
+if(ua.includes("Mac")) os="macOS";
+if(ua.includes("Linux")) os="Linux";
+document.getElementById("browser").textContent=browser;
+document.getElementById("os").textContent=os;
+document.getElementById("device").textContent=
+/Mobi|Android|iPhone|iPad/i.test(ua)
+?"Telefon / Tablet":"Komputer";
+document.getElementById("lang").textContent=navigator.language;
+document.getElementById("screen").textContent=
+screen.width+" × "+screen.height;
+document.getElementById("cpu").textContent=
+navigator.hardwareConcurrency||"Brak danych";
+document.getElementById("ram").textContent=
+navigator.deviceMemory
+?navigator.deviceMemory+" GB"
+:"Brak danych";
+document.getElementById("theme").textContent=
+window.matchMedia("(prefers-color-scheme: dark)").matches
+?"Ciemny":"Jasny";
+document.getElementById("online").textContent=
+navigator.onLine?"Online":"Offline";
+function updateTime(){
+document.getElementById("time").textContent=
+new Date().toLocaleString("pl-PL");
+}
+updateTime();
+setInterval(updateTime,1000);
 </script>
-
 </body>
 </html>
