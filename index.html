@@ -1,119 +1,174 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Informacje o urządzeniu</title>
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-body{
-background:#0d1117;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
-color:white;
-padding:20px;
-}
-.box{
-width:500px;
-background:#161b22;
-border-radius:15px;
-padding:25px;
-box-shadow:0 0 20px rgba(0,0,0,.5);
-}
-h1{
-text-align:center;
-margin-bottom:20px;
-color:#58a6ff;
-}
-.item{
-display:flex;
-justify-content:space-between;
-padding:10px 0;
-border-bottom:1px solid #30363d;
-}
-.value{
-color:#58a6ff;
-word-break:break-word;
-text-align:right;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twoje Dane Sieciowe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .data-item {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .data-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .data-value {
+            font-size: 1rem;
+            font-weight: 400;
+            word-break: break-word;
+        }
+
+        .loading {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-<div class="box">
-<h1>Twoje informacje</h1>
-<div class="item"><span>🌐 Adres IP</span><span class="value" id="ip">Ładowanie...</span></div>
-<div class="item"><span>🏙️ Miasto</span><span class="value" id="city">...</span></div>
-<div class="item"><span>🗺️ Region</span><span class="value" id="region">...</span></div>
-<div class="item"><span>🇵🇱 Kraj</span><span class="value" id="country">...</span></div>
-<div class="item"><span>📡 Dostawca internetu</span><span class="value" id="isp">...</span></div>
-<div class="item"><span>🕒 Strefa czasowa</span><span class="value" id="timezone">...</span></div>
-<div class="item"><span>📱 Typ urządzenia</span><span class="value" id="device"></span></div>
-<div class="item"><span>💻 System</span><span class="value" id="os"></span></div>
-<div class="item"><span>🌐 Przeglądarka</span><span class="value" id="browser"></span></div>
-<div class="item"><span>🗣️ Język</span><span class="value" id="lang"></span></div>
-<div class="item"><span>🖥️ Rozdzielczość</span><span class="value" id="screen"></span></div>
-<div class="item"><span>🧠 Rdzenie CPU</span><span class="value" id="cpu"></span></div>
-<div class="item"><span>💾 RAM</span><span class="value" id="ram"></span></div>
-<div class="item"><span>🌙 Motyw</span><span class="value" id="theme"></span></div>
-<div class="item"><span>🌐 Status</span><span class="value" id="online"></span></div>
-<div class="item"><span>📅 Data i godzina</span><span class="value" id="time"></span></div>
-</div>
-<script>
-fetch("https://ipapi.co/json/")
-.then(r=>r.json())
-.then(data=>{
-document.getElementById("ip").textContent=data.ip;
-document.getElementById("city").textContent=data.city;
-document.getElementById("region").textContent=data.region;
-document.getElementById("country").textContent=data.country_name;
-document.getElementById("isp").textContent=data.org;
-document.getElementById("timezone").textContent=data.timezone;
-});
-const ua=navigator.userAgent;
-let browser="Nieznana";
-if(ua.includes("Chrome")) browser="Google Chrome";
-if(ua.includes("Firefox")) browser="Mozilla Firefox";
-if(ua.includes("Safari")&&!ua.includes("Chrome")) browser="Safari";
-if(ua.includes("Edg")) browser="Microsoft Edge";
-let os="Nieznany";
-if(ua.includes("Windows")) os="Windows";
-if(ua.includes("Android")) os="Android";
-if(ua.includes("iPhone")) os="iPhone (iOS)";
-if(ua.includes("iPad")) os="iPad (iPadOS)";
-if(ua.includes("Mac")) os="macOS";
-if(ua.includes("Linux")) os="Linux";
-document.getElementById("browser").textContent=browser;
-document.getElementById("os").textContent=os;
-document.getElementById("device").textContent=
-/Mobi|Android|iPhone|iPad/i.test(ua)
-?"Telefon / Tablet":"Komputer";
-document.getElementById("lang").textContent=navigator.language;
-document.getElementById("screen").textContent=
-screen.width+" × "+screen.height;
-document.getElementById("cpu").textContent=
-navigator.hardwareConcurrency||"Brak danych";
-document.getElementById("ram").textContent=
-navigator.deviceMemory
-?navigator.deviceMemory+" GB"
-:"Brak danych";
-document.getElementById("theme").textContent=
-window.matchMedia("(prefers-color-scheme: dark)").matches
-?"Ciemny":"Jasny";
-document.getElementById("online").textContent=
-navigator.onLine?"Online":"Offline";
-function updateTime(){
-document.getElementById("time").textContent=
-new Date().toLocaleString("pl-PL");
-}
-updateTime();
-setInterval(updateTime,1000);
-</script>
+
+    <div class="container">
+        <h1>Digital <span>Footprint</span></h1>
+        
+        <div class="data-grid">
+            <div class="data-item">
+                <div class="data-label">Adres IP</div>
+                <div class="data-value" id="ip"><span class="loading">Ładowanie...</span></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Miejscowość</div>
+                <div class="data-value" id="city"><span class="loading">Ładowanie...</span></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Region / Powiat</div>
+                <div class="data-value" id="region"><span class="loading">Ładowanie...</span></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Dostawca Internetu (ISP)</div>
+                <div class="data-value" id="isp"><span class="loading">Ładowanie...</span></div>
+            </div>
+
+            <div class="data-item">
+                <div class="data-label">System / Platforma</div>
+                <div class="data-value" id="platform"></div>
+            </div>
+            <div class="data-item" style="grid-column: 1 / -1;">
+                <div class="data-label">Urządzenie (User-Agent)</div>
+                <div class="data-value" id="user-agent"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Rozdzielczość ekranu</div>
+                <div class="data-value" id="resolution"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Język systemowy</div>
+                <div class="data-value" id="language"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Rdzenie procesora</div>
+                <div class="data-value" id="cores"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Pamięć RAM</div>
+                <div class="data-value" id="ram"></div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">Strefa czasowa</div>
+                <div class="data-value" id="timezone"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pobieranie danych z przeglądarki (natychmiastowe)
+        document.getElementById('platform').textContent = navigator.platform || "Nieznana";
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('resolution').textContent = ${screen.width} x ${screen.height};
+        document.getElementById('language').textContent = navigator.language;
+        document.getElementById('cores').textContent = navigator.hardwareConcurrency ? ${navigator.hardwareConcurrency} rdzeni : "Brak dostępu";
+        document.getElementById('ram').textContent = navigator.deviceMemory ? ~${navigator.deviceMemory} GB : "Brak dostępu";
+        document.getElementById('timezone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Pobieranie danych o IP i lokalizacji (asynchroniczne przez darmowe API ipapi.co)
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.error) {
+                    throw new Error("Limit zapytań API");
+                }
+                document.getElementById('ip').textContent = data.ip || "Brak danych";
+                document.getElementById('city').textContent = data.city || "Brak danych";
+                document.getElementById('region').textContent = data.region || "Brak danych";
+                document.getElementById('isp').textContent = data.org || "Brak danych";
+            })
+            .catch(error => {
+                console.error('Błąd pobierania danych IP:', error);
+                document.getElementById('ip').textContent = "Błąd pobierania";
+                document.getElementById('city').textContent = "Błąd pobierania";
+                document.getElementById('region').textContent = "Błąd pobierania";
+                document.getElementById('isp').textContent = "Błąd pobierania";
+            });
+    </script>
 </body>
 </html>
