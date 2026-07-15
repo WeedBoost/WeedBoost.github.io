@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM CORRUPTED - ERROR 404</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .terminal {
+            width: 90%;
+            max-width: 650px;
+            background: rgba(0, 10, 0, 0.9);
+            border: 2px solid #0f0;
+            padding: 20px;
+            box-shadow: 0 0 20px #0f0;
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+            font-size: 1.8rem;
+            margin-top: 0;
+        }
+        .line {
+            margin: 10px 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.2);
+            padding-bottom: 5px;
+        }
+        .label {
+            color: #888;
+        }
+        .val {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffcc00;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <h1>[!] SYSTEM MONITORING ACTIVE [!]</h1>
+    <p style="text-align: center; color: #ff0000;">Zostawiłeś otwarte drzwi... Znamy Twoją lokalizację.</p>
+    <hr style="border: 1px solid #0f0;">
+    
+    <div class="line"><span class="label">Twój Adres IP:</span> <span class="val" id="ip">Pobieranie...</span></div>
+    <div class="line"><span class="label">Lokalizacja:</span> <span class="val" id="location">Pobieranie...</span></div>
+    <div class="line"><span class="label">Dostawca Internetu:</span> <span class="val" id="isp">Pobieranie...</span></div>
+    <div class="line"><span class="label">Urządzenie & System:</span> <span class="val" id="os">Pobieranie...</span></div>
+    <div class="line"><span class="label">Przeglądarka:</span> <span class="val" id="browser">Pobieranie...</span></div>
+    <div class="line"><span class="label">Rozdzielczość ekranu:</span> <span class="val" id="resolution">Pobieranie...</span></div>
+    <div class="line"><span class="label">Stan baterii:</span> <span class="val" id="battery">Pobieranie...</span></div>
+    <div class="line"><span class="label">Twój czas lokalny:</span> <span class="val" id="time">Pobieranie...</span></div>
+
+    <div class="warning">POŁĄCZENIE ZABEZPIECZONE. NIE ZAMYKAJ OKNA.</div>
+</div>
+
+<script>
+    // Pobieranie IP i szczegółowej lokalizacji (powiat, miasto, ISP)
+    fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('ip').textContent = data.ip || "Nie wykryto";
+            
+            // Tworzenie ładnego formatu lokalizacji (Miasto, Powiat/Region, Kraj)
+            let city = data.city || "";
+            let region = data.region || "";
+            let country = data.country_name || "";
+            let fullLoc = ${city} (${region}), ${country};
+            document.getElementById('location').textContent = fullLoc;
+            
+            document.getElementById('isp').textContent = data.org || "Nieznany";
+        })
+        .catch(() => {
+            document.getElementById('ip').textContent = "Zablokowano (używasz AdBlocka?)";
+            document.getElementById('location').textContent = "Nieznana";
+            document.getElementById('isp').textContent = "Nieznany";
+        });
+
+    // Pobieranie systemu operacyjnego i urządzenia
+    function getOSAndDevice() {
+        const ua = navigator.userAgent;
+        let os = "Nieznany OS";
+        let device = "Komputer PC/Laptop";
+
+        if (ua.indexOf("Windows") !== -1) os = "Windows";
+        else if (ua.indexOf("Macintosh") !== -1) os = "macOS";
+        else if (ua.indexOf("Linux") !== -1) os = "Linux";
+        else if (ua.indexOf("Android") !== -1) { os = "Android"; device = "Telefon/Tablet"; }
+        else if (ua.indexOf("iPhone") !== -1) { os = "iOS (iPhone)"; device = "Telefon"; }
+        else if (ua.indexOf("iPad") !== -1) { os = "iOS (iPad)"; device = "Tablet"; }
+
+        return ${device} (${os});
+    }
+    document.getElementById('os').textContent = getOSAndDevice();
+
+    // Pobieranie przeglądarki
+    function getBrowser() {
+        const ua = navigator.userAgent;
+        if (ua.indexOf("Chrome") !== -1 && ua.indexOf("Safari") !== -1 && ua.indexOf("Edg") === -1) return "Google Chrome";
+        if (ua.indexOf("Safari") !== -1 && ua.indexOf("Chrome") === -1) return "Safari";
+        if (ua.indexOf("Firefox") !== -1) return "Mozilla Firefox";
+        if (ua.indexOf("Edg") !== -1) return "Microsoft Edge";
+        if (ua.indexOf("OPR") !== -1 || ua.indexOf("Opera") !== -1) return "Opera";
+        return "Inna/Ukryta";
+    }
+    document.getElementById('browser').textContent = getBrowser();
+
+    // Rozdzielczość ekranu
+    document.getElementById('resolution').textContent = ${window.screen.width} x ${window.screen.height} px;
+
+    // Czas lokalny
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('time').textContent = now.toLocaleTimeString() + " (" + now.toLocaleDateString() + ")";
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Poziom baterii (jeśli przeglądarka wspiera API baterii)
+    if (navigator.getBattery) {
+        navigator.getBattery().then(function(battery) {
+            function updateBatteryStatus() {
+                const level = Math.round(battery.level * 100);
+                const charging = battery.charging ? " (Ładowanie)" : " (Rozładowywanie)";
+                document.getElementById('battery').textContent = ${level}%${charging};
+            }
+            updateBatteryStatus();
+            battery.addEventListener('levelchange', updateBatteryStatus);
+            battery.addEventListener('chargingchange', updateBatteryStatus);
+        });
+    } else {
+        document.getElementById('battery').textContent = "Brak dostępu / PC";
+    }
+</script>
+
+</body>
+</html>
