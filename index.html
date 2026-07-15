@@ -63,8 +63,7 @@
 
 <div class="terminal">
     <h1>[!] SYSTEM MONITORING ACTIVE [!]</h1>
-    <p style="text-align: center; color: #ff0000;">Zostawiłeś otwarte drzwi... Znamy Twoją lokalizację.</p>
-    <hr style="border: 1px solid #0f0;">
+    <hr style="border: 1px solid #0f0; margin-bottom: 15px;">
     
     <div class="line"><span class="label">Twój Adres IP:</span> <span class="val" id="ip">Pobieranie...</span></div>
     <div class="line"><span class="label">Lokalizacja:</span> <span class="val" id="location">Pobieranie...</span></div>
@@ -79,28 +78,34 @@
 </div>
 
 <script>
-    // Pobieranie IP i szczegółowej lokalizacji (powiat, miasto, ISP)
-    fetch('https://ipapi.co/json/')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('ip').textContent = data.ip || "Nie wykryto";
-            
-            // Tworzenie ładnego formatu lokalizacji (Miasto, Powiat/Region, Kraj)
-            let city = data.city || "";
-            let region = data.region || "";
-            let country = data.country_name || "";
-            let fullLoc = ${city} (${region}), ${country};
-            document.getElementById('location').textContent = fullLoc;
-            
-            document.getElementById('isp').textContent = data.org || "Nieznany";
-        })
-        .catch(() => {
-            document.getElementById('ip').textContent = "Zablokowano (używasz AdBlocka?)";
-            document.getElementById('location').textContent = "Nieznana";
-            document.getElementById('isp').textContent = "Nieznany";
-        });
+    // 1. Pobieranie IP oraz szczegółów sieci/lokalizacji
+    async function getIpData() {
+        try {
+            // Najpierw pobieramy sam adres IP z bezpiecznego API HTTPS
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const userIp = ipData.ip;
+            document.getElementById('ip').textContent = userIp;
 
-    // Pobieranie systemu operacyjnego i urządzenia
+            // Następnie pobieramy szczegóły lokalizacji dla tego IP
+            const locResponse = await fetch(https://ipapi.co/${userIp}/json/);
+            const locData = await locResponse.json();
+            
+            let city = locData.city || "";
+            let region = locData.region || "";
+            let country = locData.country_name || "";
+            
+            document.getElementById('location').textContent = ${city} (${region}), ${country};
+            document.getElementById('isp').textContent = locData.org || "Nieznany";
+        } catch (error) {
+            document.getElementById('ip').textContent = "Ukryty/VPN";
+            document.getElementById('location').textContent = "Zablokowana (AdBlock?)";
+            document.getElementById('isp').textContent = "Prywatny dostawca";
+        }
+    }
+    getIpData();
+
+    // 2. Pobieranie systemu operacyjnego i urządzenia
     function getOSAndDevice() {
         const ua = navigator.userAgent;
         let os = "Nieznany OS";
@@ -117,7 +122,7 @@
     }
     document.getElementById('os').textContent = getOSAndDevice();
 
-    // Pobieranie przeglądarki
+    // 3. Pobieranie przeglądarki
     function getBrowser() {
         const ua = navigator.userAgent;
         if (ua.indexOf("Chrome") !== -1 && ua.indexOf("Safari") !== -1 && ua.indexOf("Edg") === -1) return "Google Chrome";
@@ -129,10 +134,10 @@
     }
     document.getElementById('browser').textContent = getBrowser();
 
-    // Rozdzielczość ekranu
+    // 4. Rozdzielczość ekranu
     document.getElementById('resolution').textContent = ${window.screen.width} x ${window.screen.height} px;
 
-    // Czas lokalny
+    // 5. Czas lokalny
     function updateTime() {
         const now = new Date();
         document.getElementById('time').textContent = now.toLocaleTimeString() + " (" + now.toLocaleDateString() + ")";
@@ -140,7 +145,7 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Poziom baterii (jeśli przeglądarka wspiera API baterii)
+    // 6. Poziom baterii
     if (navigator.getBattery) {
         navigator.getBattery().then(function(battery) {
             function updateBatteryStatus() {
